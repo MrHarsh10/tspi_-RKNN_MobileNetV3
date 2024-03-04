@@ -8,7 +8,7 @@
 
 ## MobileNetV3
 
-    MobileNetV3是由G
+   MobileNetV3 是 Google 开发的用于移动设备和嵌入式设备的神经网络架构之一，在提高在资源受限的设备上进行计算的效率。与之前的版本相比，MobileNetV3 在准确性和速度方面都有所改进。
 
 ### 模型训练
 
