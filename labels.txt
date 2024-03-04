@@ -1,0 +1,5 @@
+cat
+cattle
+dog
+house
+pig
