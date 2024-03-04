@@ -22,7 +22,7 @@
 source .bashrc #这个命令不能在windows系统上运行，请打开Anaconda Prompt (Miniconda3)
 ```
 
-![](C:\Users\13890\AppData\Roaming\marktext\images\2024-03-03-16-37-39-image.png)
+![](https://s2.loli.net/2024/03/04/uoK6R5xdLFPA1fS.png)
 
 conda在国内需要换源获得更高的下载速度[anaconda | 镜像站使用帮助 | 清华大学开源软件镜像站 | Tsinghua Open Source Mirror](https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/)
 
@@ -40,7 +40,7 @@ conda create -n moblienet python=3.10
 conda activate moblienet
 ```
 
-![](C:\Users\13890\AppData\Roaming\marktext\images\2024-03-03-16-38-05-image.png)
+![](https://s2.loli.net/2024/03/04/QLCpH2sygVEGJFf.png)
 
 ### 安装torch
 
@@ -58,17 +58,17 @@ pip3 install torch torchvision torchaudio
 python train.py 
 ```
 
-<img src="file:///C:/Users/13890/AppData/Roaming/marktext/images/2024-03-03-18-49-11-image.png" title="" alt="" data-align="center">
+![](https://s2.loli.net/2024/03/04/nliS39p4VrxJoHC.png)
 
 训练完成后就会保存网络的模型以及权重
 
-![](C:\Users\13890\AppData\Roaming\marktext\images\2024-03-03-18-54-12-image.png)
+![](https://s2.loli.net/2024/03/04/8do1SeEzr2s9Tna.png)
 
 ### RKNN模型转换
 
 [GitHub - rockchip-linux/rknn-toolkit2](https://github.com/rockchip-linux/rknn-toolkit2/tree/master)
 
-![](C:\Users\13890\AppData\Roaming\marktext\images\2024-03-03-20-52-23-image.png)
+![](https://s2.loli.net/2024/03/04/8u5sYXoC6Ewmjc4.png)
 
 模型转换需要一台ubuntu的机器，并克隆rknn-toolkit2仓库,同时新建一个conda 环境
 
@@ -87,11 +87,17 @@ cd rknn-toolkit2/rknn-toolkit2/packages/
 pip install rknn_toolkit2-1.6.0+81f21f4d-cp310-cp310-linux_x86_64.whl 
 ```
 
-在仓库里面提供了pt2rknn.py
+在仓库里面提供了pt2rknn.py,在安装rknn_toolkit2时候，请使用阿里云镜像
 
-![](C:\Users\13890\AppData\Roaming\marktext\images\2024-03-03-20-52-00-image.png)
+[pypi镜像_pypi下载地址_pypi安装教程-阿里巴巴开源镜像站](https://developer.aliyun.com/mirror/pypi?spm=a2c6h.13651102.0.0.2ac31b11vYRRy3)
 
-![](C:\Users\13890\AppData\Roaming\marktext\images\2024-03-03-21-27-52-image.png)
+```bash
+python pt2rknn.py
+```
+
+![](https://s2.loli.net/2024/03/04/9E6Tn8L3GQobPu2.png)
+
+![](https://s2.loli.net/2024/03/04/XNwQbtRVuZD7ISe.png)
 
 pt2rknn代码中，存在一个量化选项，填入  `True`进行整型量化，但实验测试其精度损失严重
 
@@ -101,4 +107,68 @@ ret = rknn.build(do_quantization=False, dataset='./dataset.txt')
 
 ### 模型在泰山派上部署
 
+请在在泰山派上下载官方提供的Debian10镜像，Ubuntu系统测试有一定点Bug
 
+然后我喜欢在PC机上远程连接泰山派，使用的软件是 [*MobaXterm*](http://www.baidu.com/link?url=KIi6MGunswJXl6_aI59nxuXANCpEwI7EnC8cqee5IRSPaQ0vEBG48W6oVDGsBWZ4)
+
+![](https://s2.loli.net/2024/03/04/fqDJgbxoI3lSLAc.png)
+
+    sudo apt update
+    sudo apt upgrade
+
+安装miniconda
+
+```bash
+mkdir -p ~/miniconda3
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh -O ~/miniconda3/miniconda.sh
+bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+rm -rf ~/miniconda3/miniconda.sh
+~/miniconda3/bin/conda init bash
+~/miniconda3/bin/conda init zs
+source .bashrc
+```
+
+同时建议换源[anaconda | 镜像站使用帮助 | 清华大学开源软件镜像站 | Tsinghua Open Source Mirror](https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/)
+
+下载更新NPU驱动https://github.com/rockchip-linux/rknpu2
+
+```bash
+git clone https://github.com/rockchip-linux/rknpu2.git #建议PC下载后利用Mobaxterm开发板上
+```
+
+```bash
+cp rknpu2/runtime/RK356X/Linux/rknn_server/aarch64/usr/bin/rknn_server /usr/bin/rknn_server
+cp rknpu2/runtime/RK356X/Linux/librknn_api/aarch64/librknnrt.so /usr/lib/librknnrt.so
+cp rknpu2/runtime/RK356X/Linux/librknn_api/aarch64/librknn_api.so /usr/lib/librknn_api.so
+```
+
+```bash
+ bash rknpu2/runtime/RK356X/Linux/rknn_server/aarch64/usr/bin/start_rknn.sh
+                                                                                                                 bin/start_rknn.sh
+```
+
+创建Python环境
+
+```bash
+conda create -n rknn python=3.10
+conda activate rknn
+sudo apt update
+sudo apt upgrade
+sudo apt install gcc
+```
+
+https://github.com/rockchip-linux/rknn-toolkit2/tree/master/rknn_toolkit_lite2/packages
+
+选取合适的包下载并安装安装
+
+```bash
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+pip install rknn_toolkit_lite2-1.6.0-cp310-cp310-linux_aarch64.whl
+pip install opencv-python
+```
+
+到此板卡环境就安装好了
+
+运行我们的测试代码
+
+    python test.py
