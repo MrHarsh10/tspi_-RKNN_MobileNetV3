@@ -92,5 +92,9 @@ for t in range(epochs):
 print(" Train Done!")
 print("==============================")
 model.to("cpu")
-torch.save(model, "MobileNetV3.pt")
+input_tensor = torch.rand(1, 3, 224, 224)
+traced_script_module = torch.jit.trace(model, input_tensor)
+
+traced_script_module.save("MobileNetV3.pt")
+
 print("mode has save to MobileNetV3.pt")
